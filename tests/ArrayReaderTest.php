@@ -240,6 +240,111 @@ class ArrayReaderTest extends TestCase
     /**
      * Test.
      *
+     * @dataProvider providerGetFloat
+     *
+     * @param mixed $data The data
+     * @param string $key The lookup key
+     * @param mixed $default The default value
+     * @param mixed $expected The expected value
+     *
+     * @return void
+     */
+    public function testGetFloat($data, string $key, $default, $expected)
+    {
+        $reader = new ArrayReader($data);
+        static::assertSame($expected, $reader->findFloat($key, $default));
+        static::assertSame($expected, $reader->getFloat($key, $default));
+    }
+
+    /**
+     * Provider.
+     *
+     * @return array[] The test data
+     */
+    public function providerGetFloat(): array
+    {
+        return [
+            [['key' => 123.456], 'key', null, 123.456],
+            [['key' => null], 'key', 123.456, 123.456],
+            [['key' => 123.456], 'nope', 123.45, 123.45],
+            [['key' => ['key2' => 123.456]], 'key.key2', null, 123.456],
+            [['key' => ['key2' => 123.456]], 'key.nope', 123.45, 123.45],
+        ];
+    }
+
+    /**
+     * Test.
+     *
+     * @dataProvider providerGetFloatError
+     *
+     * @param mixed $data The data
+     * @param string $key The lookup key
+     *
+     * @return void
+     */
+    public function testGetFloatError($data, string $key)
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $reader = new ArrayReader($data);
+        $reader->getFloat($key);
+
+        static::assertTrue(true);
+    }
+
+    /**
+     * Provider.
+     *
+     * @return array[] The test data
+     */
+    public function providerGetFloatError(): array
+    {
+        return [
+            [['key' => 123.456], 'nope'],
+            [['key' => null], 'nope'],
+            [['key' => ['key2' => 123.456]], 'key.nope'],
+            [['key' => ['key2' => null]], 'key.key2'],
+        ];
+    }
+
+    /**
+     * Test.
+     *
+     * @dataProvider providerFindFloat
+     *
+     * @param mixed $data The data
+     * @param string $key The lookup key
+     * @param mixed $default The default value
+     * @param mixed $expected The expected value
+     *
+     * @return void
+     */
+    public function testFindFloat($data, string $key, $default, $expected)
+    {
+        $reader = new ArrayReader($data);
+        static::assertSame($expected, $reader->findFloat($key, $default));
+    }
+
+    /**
+     * Provider.
+     *
+     * @return array[] The test data
+     */
+    public function providerFindFloat(): array
+    {
+        return [
+            [['key' => 123.456], 'key', null, 123.456],
+            [['key' => null], 'key', 123.456, 123.456],
+            [['key' => null], 'key', null, null],
+            [['key' => 123.456], 'nope', 123.45, 123.45],
+            [['key' => ['key2' => 123.456]], 'key.key2', null, 123.456],
+            [['key' => ['key2' => 123.456]], 'key.nope', 123.45, 123.45],
+        ];
+    }
+
+    /**
+     * Test.
+     *
      * @dataProvider providerGetArray
      *
      * @param mixed $data The data
